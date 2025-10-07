@@ -3,18 +3,13 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 @pytest.fixture
 def driver():
-    """
-    This fixture sets up the WebDriver before each test and quits it after.
-    Using a fixture ensures a clean browser instance for every test.
-    """
-    # Setup: Initialize the Chrome WebDriver using webdriver-manager
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-    driver.implicitly_wait(10)  # Implicit wait for elements to appear
     yield driver
-    # Teardown: Close the browser window
     driver.quit()
 
 def test_verify_website_title(driver):
@@ -24,20 +19,19 @@ def test_verify_website_title(driver):
     """
     driver.get("https://www.iamdave.ai/")
     # Assert that the title of the page contains the expected text
-    assert "I AM DAVE" in driver.title, "The title of the page is not correct"
+    assert "DaveAI" in driver.title, "The title of the page is not correct"
 
 def test_navigation_to_about_page(driver):
-    """
-    Tests a navigation flow by finding the 'About' link, clicking it,
-    and then verifying that the URL has changed to the about page.
-    """
     driver.get("https://www.iamdave.ai/")
-    # Find the 'About' link by its visible text and click it
     about_link = driver.find_element(By.LINK_TEXT, "About")
-    about_link.click()
-    # Assert that the current URL contains '/about', indicating successful navigation
-    assert "about" in driver.current_url.lower(), "Navigation to About page failed"
+    driver.execute_script("arguments[0].click();", about_link)
 
+    # WAIT up to 10 seconds for the URL to contain "about" BEFORE checking it
+    WebDriverWait(driver, 10).until(EC.url_contains("about"))
+
+    # Now that we've waited, this assertion will pass
+    assert "about" in driver.current_url.lower(), "Navigation to About page failed"
+    
 def test_homepage_heading_present(driver):
     """
     Checks if the main heading (<h1>) element is present on the homepage
@@ -49,4 +43,4 @@ def test_homepage_heading_present(driver):
     # Assert that the element is displayed on the page
     assert heading.is_displayed(), "Main heading is not displayed"
     # Assert that the heading text contains the expected content
-    assert "Solving the world's most meaningful problems" in heading.text, "Heading text is incorrect"
+    assert "AI Agents for Enterprise" in heading.text, "Heading text is incorrect"

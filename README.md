@@ -28,10 +28,13 @@ To run this project, you'll need to have **Python 3** and **Google Chrome** inst
     ```
 
 ---
+## How to Run the Tests
 
-## [cite_start]▶️ How to Run the Tests 
-
-Make sure your virtual environment is activated. Navigate to the project's root directory (`QA`) and run the following command in your terminal:
+Make sure your virtual environment is activated. Run the tests by specifying the path to each test file:
 
 ```bash
-pytest
+# To run all API tests
+pytest tests/api_tests.py
+
+# To run all UI tests
+pytest tests/ui_tests.py
